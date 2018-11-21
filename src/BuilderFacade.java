@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 class Persona {
 
     public String streetAddress, postcode, city;
@@ -78,6 +81,60 @@ class PersonaJobBuilder extends PersonaBuilder {
     }
 }
 
+class Field {
+    public String name, type;
+
+    public Field(String name, String type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    @Override
+    public String
+    toString() {
+       return String.format("public %s %s;", type, name);
+    }
+}
+
+class Class {
+    public String name;
+    public List<Field> fields = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        String nl = System.lineSeparator();
+        stringBuilder.append("public class " + name).append(nl)
+                .append("{").append(nl);
+        for (Field field : fields)
+            stringBuilder.append("  " + field).append(nl);
+        return stringBuilder.append("}").append(nl).toString();
+
+    }
+}
+
+
+class CodeBuilder
+{
+    private Class theClass = new Class();
+
+    public CodeBuilder(String rootName)
+    {
+        theClass.name = rootName;
+    }
+
+    public CodeBuilder addField(String name, String type)
+    {
+        theClass.fields.add(new Field(name, type));
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return theClass.toString();
+    }
+}
+
 public class BuilderFacade {
     public static void main(String[] args) {
         PersonaBuilder personaBuilder = new PersonaBuilder();
@@ -92,5 +149,11 @@ public class BuilderFacade {
                     .earning(25000)
                 .build();
         System.out.println(persona);
+
+        CodeBuilder codeBuilder = new CodeBuilder("Game");
+        codeBuilder.addField("age", "int")
+                .addField("name", "String").toString();
+        System.out.println(codeBuilder);
+
     }
 }
